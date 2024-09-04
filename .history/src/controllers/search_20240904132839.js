@@ -37,14 +37,10 @@ searchController.search = async function (req, res, next) {
 		const renderData = await prepareRenderData(req, searchData);
 		res.render('search', renderData);
 	} catch (error) {
-		console.error('Search error:', error);
-		// Instead of returning a 500 error, return an empty result
-		const emptyResult = { posts: [], matchCount: 0, pageCount: 1, time: 0 };
-		if (parseInt(req.query.searchOnly, 10) === 1) {
-			return res.json(emptyResult);
+		if (req.path.startsWith('/api/')) {
+			return res.status(500).json({ error: error.message });
 		}
-		const renderData = await prepareRenderData(req, emptyResult);
-		res.render('search', renderData);
+		next(error);
 	}
 };
 
@@ -74,27 +70,27 @@ async function prepareSearchData(req, page) {
 }
 
 async function performSearch(req) {
-	const page = Math.max(1, parseInt(req.query.page, 10)) || 1;
-	const data = await prepareSearchData(req, page);
-	let searchData;
-	try {
-		[searchData] = await Promise.all([
-			search.search(data),
-			recordSearch(data),
-		]);
-	} catch (error) {
-		// If search fails, return an empty result set
-		searchData = { posts: [], matchCount: 0, pageCount: 1, time: 0 };
-	}
+    const page = Math.max(1, parseInt(req.query.page, 10)) || 1;
+    const data = await prepareSearchData(req, page);
+    let searchData;
+    try {
+        [searchData] = await Promise.all([
+            search.search(data),
+            recordSearch(data),
+        ]);
+    } catch (error) {
+        console.error('Search operation error:', error);
+        // If search fails, return an empty result set
+        searchData = { posts: [], matchCount: 0, pageCount: 1, time: 0 };
+    }
 
-	searchData.pagination = pagination.create(page, searchData.pageCount, req.query);
-	searchData.multiplePages = searchData.pageCount > 1;
-	searchData.search_query = validator.escape(String(req.query.term || ''));
-	searchData.term = req.query.term;
+    searchData.pagination = pagination.create(page, searchData.pageCount, req.query);
+    searchData.multiplePages = searchData.pageCount > 1;
+    searchData.search_query = validator.escape(String(req.query.term || ''));
+    searchData.term = req.query.term;
 
-	return searchData;
+    return searchData;
 }
-
 async function getUserPrivileges(uid) {
 	return await utils.promiseParallel({
 		'search:users': privileges.global.can('search:users', uid),

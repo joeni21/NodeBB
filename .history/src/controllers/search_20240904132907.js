@@ -38,13 +38,10 @@ searchController.search = async function (req, res, next) {
 		res.render('search', renderData);
 	} catch (error) {
 		console.error('Search error:', error);
-		// Instead of returning a 500 error, return an empty result
-		const emptyResult = { posts: [], matchCount: 0, pageCount: 1, time: 0 };
-		if (parseInt(req.query.searchOnly, 10) === 1) {
-			return res.json(emptyResult);
+		if (req.path.startsWith('/api/')) {
+			return res.status(500).json({ error: 'An error occurred during search' });
 		}
-		const renderData = await prepareRenderData(req, emptyResult);
-		res.render('search', renderData);
+		next(error);
 	}
 };
 
@@ -83,6 +80,7 @@ async function performSearch(req) {
 			recordSearch(data),
 		]);
 	} catch (error) {
+		console.error('Search operation error:', error);
 		// If search fails, return an empty result set
 		searchData = { posts: [], matchCount: 0, pageCount: 1, time: 0 };
 	}
@@ -94,7 +92,6 @@ async function performSearch(req) {
 
 	return searchData;
 }
-
 async function getUserPrivileges(uid) {
 	return await utils.promiseParallel({
 		'search:users': privileges.global.can('search:users', uid),

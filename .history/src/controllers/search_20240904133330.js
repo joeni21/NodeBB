@@ -23,29 +23,29 @@ const searchController = module.exports;
 
 
 searchController.search = async function (req, res, next) {
-	if (!plugins.hooks.hasListeners('filter:search.query')) {
-		return next();
-	}
+    if (!plugins.hooks.hasListeners('filter:search.query')) {
+        return next();
+    }
 
-	try {
-		const searchData = await performSearch(req);
+    try {
+        const searchData = await performSearch(req);
 
-		if (parseInt(req.query.searchOnly, 10) === 1) {
-			return res.json(searchData);
-		}
+        if (parseInt(req.query.searchOnly, 10) === 1) {
+            return res.json(searchData);
+        }
 
-		const renderData = await prepareRenderData(req, searchData);
-		res.render('search', renderData);
-	} catch (error) {
-		console.error('Search error:', error);
-		// Instead of returning a 500 error, return an empty result
-		const emptyResult = { posts: [], matchCount: 0, pageCount: 1, time: 0 };
-		if (parseInt(req.query.searchOnly, 10) === 1) {
-			return res.json(emptyResult);
-		}
-		const renderData = await prepareRenderData(req, emptyResult);
-		res.render('search', renderData);
-	}
+        const renderData = await prepareRenderData(req, searchData);
+        res.render('search', renderData);
+    } catch (error) {
+        console.error('Search error:', error);
+        // Instead of returning a 500 error, return an empty result
+        const emptyResult = { posts: [], matchCount: 0, pageCount: 1, time: 0 };
+        if (parseInt(req.query.searchOnly, 10) === 1) {
+            return res.json(emptyResult);
+        }
+        const renderData = await prepareRenderData(req, emptyResult);
+        res.render('search', renderData);
+    }
 };
 
 
