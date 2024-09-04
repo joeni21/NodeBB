@@ -204,6 +204,10 @@ async function prepareSearchData(req, page) {
     };
 }
 
+// ... existing code ...
+
+// Add these new functions:
+
 async function getUserPrivileges(uid) {
     return await utils.promiseParallel({
         'search:users': privileges.global.can('search:users', uid),
