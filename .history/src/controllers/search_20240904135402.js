@@ -39,7 +39,7 @@ searchController.search = async function (req, res, next) {
 	} catch (error) {
 		console.error('Search error:', error);
 		// Instead of returning a 500 error, return an empty result
-		const emptyResult = { posts: [], matchCount: 0, pageCount: 1, time: '0' };
+		const emptyResult = { posts: [], matchCount: 0, pageCount: 1, time: 0 };
 		if (parseInt(req.query.searchOnly, 10) === 1) {
 			return res.json(emptyResult);
 		}
@@ -87,6 +87,10 @@ async function performSearch(req) {
 		searchData = { posts: [], matchCount: 0, pageCount: 1, time: 0 };
 	}
 
+	// Convert time to string if it's not already
+	// if (typeof searchData.time === 'number') {
+	// 	searchData.time = searchData.time.toString();
+	// }
 
 	searchData.pagination = pagination.create(page, searchData.pageCount, req.query);
 	searchData.multiplePages = searchData.pageCount > 1;
