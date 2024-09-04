@@ -88,9 +88,9 @@ async function performSearch(req) {
 	}
 
 	// Convert time to string if it's not already
-	if (typeof searchData.time === 'number') {
-		searchData.time = searchData.time.toString();
-	}
+    if (typeof searchData.time === 'number') {
+        searchData.time = searchData.time.toString();
+    }
 
 	searchData.pagination = pagination.create(page, searchData.pageCount, req.query);
 	searchData.multiplePages = searchData.pageCount > 1;
