@@ -46,27 +46,27 @@ searchController.search = async function (req, res, next) {
 
 
 async function prepareSearchData(req, page) {
-	const userPrivileges = await getUserPrivileges(req.uid);
-	await validateSearchPermissions(req, userPrivileges);
-	return {
-		query: req.query.term,
-		searchIn: req.query.in || meta.config.searchDefaultIn || 'titlesposts',
-		matchWords: req.query.matchWords || 'all',
-		postedBy: req.query.by,
-		categories: Array.isArray(req.query.categories) ? req.query.categories : [req.query.categories],
-		searchChildren: req.query.searchChildren,
-		hasTags: Array.isArray(req.query.hasTags) ? req.query.hasTags : [req.query.hasTags],
-		replies: validator.escape(String(req.query.replies || '')),
-		repliesFilter: validator.escape(String(req.query.repliesFilter || '')),
-		timeRange: validator.escape(String(req.query.timeRange || '')),
-		timeFilter: validator.escape(String(req.query.timeFilter || '')),
-		sortBy: validator.escape(String(req.query.sortBy || '')) || meta.config.searchDefaultSortBy || '',
-		sortDirection: validator.escape(String(req.query.sortDirection || '')),
-		page: page,
-		itemsPerPage: req.query.itemsPerPage,
-		uid: req.uid,
-		qs: req.query,
-	};
+const userPrivileges = await getUserPrivileges(req.uid);
+await validateSearchPermissions(req, userPrivileges);
+return {
+	query: req.query.term,
+	searchIn: req.query.in || meta.config.searchDefaultIn || 'titlesposts',
+	matchWords: req.query.matchWords || 'all',
+	postedBy: req.query.by,
+	categories: Array.isArray(req.query.categories) ? req.query.categories : [req.query.categories],
+	searchChildren: req.query.searchChildren,
+	hasTags: Array.isArray(req.query.hasTags) ? req.query.hasTags : [req.query.hasTags],
+	replies: validator.escape(String(req.query.replies || '')),
+	repliesFilter: validator.escape(String(req.query.repliesFilter || '')),
+	timeRange: validator.escape(String(req.query.timeRange || '')),
+	timeFilter: validator.escape(String(req.query.timeFilter || '')),
+	sortBy: validator.escape(String(req.query.sortBy || '')) || meta.config.searchDefaultSortBy || '',
+	sortDirection: validator.escape(String(req.query.sortDirection || '')),
+	page: page,
+	itemsPerPage: req.query.itemsPerPage,
+	uid: req.uid,
+	qs: req.query,
+};
 }
 
 async function performSearch(req) {
