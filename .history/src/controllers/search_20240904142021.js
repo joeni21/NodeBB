@@ -105,7 +105,7 @@ async function performSearch(req) {
 	}
 
 	searchData.pagination = pagination.create(page, searchData.pageCount || 1, req.query);
-	searchData.multiplePages = searchData.pageCount > 1;
+    searchData.multiplePages = searchData.pageCount > 1;
 	searchData.search_query = validator.escape(String(req.query.term || ''));
 	searchData.term = req.query.term;
 

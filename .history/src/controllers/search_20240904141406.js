@@ -96,16 +96,13 @@ async function performSearch(req) {
 	// Ensure matchCount is set correctly and is at least 1
 	searchData.matchCount = Math.max(1, searchData.posts.length);
 
-	// Ensure pageCount is set
-	searchData.pageCount = searchData.pageCount || 1;
-
 	// Convert time to string if it's not already
 	if (typeof searchData.time === 'number') {
 		searchData.time = searchData.time.toString();
 	}
 
 	searchData.pagination = pagination.create(page, searchData.pageCount || 1, req.query);
-	searchData.multiplePages = searchData.pageCount > 1;
+	searchData.multiplePages = (searchData.pageCount || 1) > 1;
 	searchData.search_query = validator.escape(String(req.query.term || ''));
 	searchData.term = req.query.term;
 

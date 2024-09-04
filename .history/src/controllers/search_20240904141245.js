@@ -84,27 +84,11 @@ async function performSearch(req) {
 		]);
 	} catch (error) {
 		// If search fails, return an empty result set
-		searchData = { posts: [{ pid: 1, tid: 1, content: 'Dummy search result', uid: 1, timestamp: Date.now() }], matchCount: 1, pageCount: 1, time: '0' };
+		searchData = { posts: [], matchCount: 0, pageCount: 1, time: '0' };
 	}
 
 
-	// Ensure there's always at least one result
-	if (!searchData.posts || searchData.posts.length === 0) {
-		searchData.posts = [{ pid: 1, tid: 1, content: 'Dummy search result', uid: 1, timestamp: Date.now() }];
-	}
-
-	// Ensure matchCount is set correctly and is at least 1
-	searchData.matchCount = Math.max(1, searchData.posts.length);
-
-	// Ensure pageCount is set
-	searchData.pageCount = searchData.pageCount || 1;
-
-	// Convert time to string if it's not already
-	if (typeof searchData.time === 'number') {
-		searchData.time = searchData.time.toString();
-	}
-
-	searchData.pagination = pagination.create(page, searchData.pageCount || 1, req.query);
+	searchData.pagination = pagination.create(page, searchData.pageCount, req.query);
 	searchData.multiplePages = searchData.pageCount > 1;
 	searchData.search_query = validator.escape(String(req.query.term || ''));
 	searchData.term = req.query.term;
