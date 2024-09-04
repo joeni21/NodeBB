@@ -19,8 +19,8 @@ const helpers = require('./helpers');
 
 const searchController = module.exports;
 
-// used GPT
-searchController.search = async function (req, res, next) {
+
+	searchController.search = async function (req, res, next) {
 	if (!plugins.hooks.hasListeners('filter:search.query')) {
 		return next();
 	}
@@ -37,11 +37,12 @@ searchController.search = async function (req, res, next) {
 	} catch (error) {
 		next(error);
 	}
-};
+	};
 
-async function performSearch(req) {
+	async function performSearch(req) {
 	const page = Math.max(1, parseInt(req.query.page, 10)) || 1;
 	const data = await prepareSearchData(req, page);
+
 	const [searchData] = await Promise.all([
 		search.search(data),
 		recordSearch(data),
@@ -53,9 +54,9 @@ async function performSearch(req) {
 	searchData.term = req.query.term;
 
 	return searchData;
-}
+	}
 
-async function prepareSearchData(req, page) {
+	async function prepareSearchData(req, page) {
 	const userPrivileges = await getUserPrivileges(req.uid);
 	await validateSearchPermissions(req, userPrivileges);
 
@@ -78,21 +79,21 @@ async function prepareSearchData(req, page) {
 		uid: req.uid,
 		qs: req.query,
 	};
-}
+	}
 
-async function getUserPrivileges(uid) {
+	async function getUserPrivileges(uid) {
 	return await utils.promiseParallel({
 		'search:users': privileges.global.can('search:users', uid),
 		'search:content': privileges.global.can('search:content', uid),
 		'search:tags': privileges.global.can('search:tags', uid),
 	});
-}
+	}
 
-async function validateSearchPermissions(req, userPrivileges) {
+	async function validateSearchPermissions(req, userPrivileges) {
 	let allowed = (req.query.in === 'users' && userPrivileges['search:users']) ||
-				(req.query.in === 'tags' && userPrivileges['search:tags']) ||
-				(req.query.in === 'categories') ||
-				(['titles', 'titlesposts', 'posts', 'bookmarks'].includes(req.query.in) && userPrivileges['search:content']);
+					(req.query.in === 'tags' && userPrivileges['search:tags']) ||
+					(req.query.in === 'categories') ||
+					(['titles', 'titlesposts', 'posts', 'bookmarks'].includes(req.query.in) && userPrivileges['search:content']);
 
 	({ allowed } = await plugins.hooks.fire('filter:search.isAllowed', {
 		uid: req.uid,
@@ -103,9 +104,9 @@ async function validateSearchPermissions(req, userPrivileges) {
 	if (!allowed) {
 		throw new Error('Not allowed');
 	}
-}
+	}
 
-async function prepareRenderData(req, searchData) {
+	async function prepareRenderData(req, searchData) {
 	const data = req.query;
 	searchData.breadcrumbs = helpers.buildBreadcrumbs([{ text: '[[global:search]]' }]);
 	searchData.showAsPosts = !data.showAs || data.showAs === 'posts';
@@ -127,9 +128,9 @@ async function prepareRenderData(req, searchData) {
 	searchData.privileges = await getUserPrivileges(req.uid);
 
 	return searchData;
-}
+	}
 
-async function getFilters(data) {
+	async function getFilters(data) {
 	return {
 		replies: {
 			active: !!data.repliesFilter,
@@ -165,8 +166,8 @@ async function getFilters(data) {
 			label: await buildSelectedCategoryLabel(data.categories),
 		},
 	};
-}
-console.log('Justin Oeni');
+	}
+
 const searches = {};
 
 async function recordSearch(data) {

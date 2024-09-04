@@ -166,7 +166,7 @@ async function getFilters(data) {
 		},
 	};
 }
-console.log('Justin Oeni');
+console.log("searchController.search");
 const searches = {};
 
 async function recordSearch(data) {

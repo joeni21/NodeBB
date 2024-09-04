@@ -19,7 +19,7 @@ const helpers = require('./helpers');
 
 const searchController = module.exports;
 
-// used GPT
+
 searchController.search = async function (req, res, next) {
 	if (!plugins.hooks.hasListeners('filter:search.query')) {
 		return next();
@@ -42,6 +42,7 @@ searchController.search = async function (req, res, next) {
 async function performSearch(req) {
 	const page = Math.max(1, parseInt(req.query.page, 10)) || 1;
 	const data = await prepareSearchData(req, page);
+	
 	const [searchData] = await Promise.all([
 		search.search(data),
 		recordSearch(data),
@@ -166,7 +167,7 @@ async function getFilters(data) {
 		},
 	};
 }
-console.log('Justin Oeni');
+
 const searches = {};
 
 async function recordSearch(data) {
