@@ -102,27 +102,7 @@ async function performSearch(req) {
 // 	};
 // }
 
-async function performSearch(req) {
-	const page = Math.max(1, parseInt(req.query.page, 10)) || 1;
-	const data = await prepareSearchData(req, page);
-	let searchData;
-	try {
-		[searchData] = await Promise.all([
-			search.search(data),
-			recordSearch(data),
-		]);
-	} catch (error) {
-		// If search fails, return an empty result set
-		searchData = { posts: [], matchCount: 0, pageCount: 1, time: 0 };
-	}
 
-	searchData.pagination = pagination.create(page, searchData.pageCount, req.query);
-	searchData.multiplePages = searchData.pageCount > 1;
-	searchData.search_query = validator.escape(String(req.query.term || ''));
-	searchData.term = req.query.term;
-
-	return searchData;
-}
 
 async function getUserPrivileges(uid) {
 	return await utils.promiseParallel({

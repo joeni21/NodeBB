@@ -20,25 +20,6 @@ const helpers = require('./helpers');
 const searchController = module.exports;
 
 // used GPT
-// searchController.search = async function (req, res, next) {
-// 	if (!plugins.hooks.hasListeners('filter:search.query')) {
-// 		return next();
-// 	}
-
-// 	try {
-// 		const searchData = await performSearch(req);
-
-// 		if (parseInt(req.query.searchOnly, 10) === 1) {
-// 			return res.json(searchData);
-// 		}
-
-// 		const renderData = await prepareRenderData(req, searchData);
-// 		res.render('search', renderData);
-// 	} catch (error) {
-// 		next(error);
-// 	}
-// };
-
 searchController.search = async function (req, res, next) {
 	if (!plugins.hooks.hasListeners('filter:search.query')) {
 		return next();
@@ -54,9 +35,6 @@ searchController.search = async function (req, res, next) {
 		const renderData = await prepareRenderData(req, searchData);
 		res.render('search', renderData);
 	} catch (error) {
-		if (req.path.startsWith('/api/')) {
-			return res.status(500).json({ error: error.message });
-		}
 		next(error);
 	}
 };
@@ -77,51 +55,29 @@ async function performSearch(req) {
 	return searchData;
 }
 
-// async function prepareSearchData(req, page) {
-// 	const userPrivileges = await getUserPrivileges(req.uid);
-// 	await validateSearchPermissions(req, userPrivileges);
+async function prepareSearchData(req, page) {
+	const userPrivileges = await getUserPrivileges(req.uid);
+	await validateSearchPermissions(req, userPrivileges);
 
-// 	return {
-// 		query: req.query.term,
-// 		searchIn: req.query.in || meta.config.searchDefaultIn || 'titlesposts',
-// 		matchWords: req.query.matchWords || 'all',
-// 		postedBy: req.query.by,
-// 		categories: Array.isArray(req.query.categories) ? req.query.categories : [req.query.categories],
-// 		searchChildren: req.query.searchChildren,
-// 		hasTags: Array.isArray(req.query.hasTags) ? req.query.hasTags : [req.query.hasTags],
-// 		replies: validator.escape(String(req.query.replies || '')),
-// 		repliesFilter: validator.escape(String(req.query.repliesFilter || '')),
-// 		timeRange: validator.escape(String(req.query.timeRange || '')),
-// 		timeFilter: validator.escape(String(req.query.timeFilter || '')),
-// 		sortBy: validator.escape(String(req.query.sortBy || '')) || meta.config.searchDefaultSortBy || '',
-// 		sortDirection: validator.escape(String(req.query.sortDirection || '')),
-// 		page: page,
-// 		itemsPerPage: req.query.itemsPerPage,
-// 		uid: req.uid,
-// 		qs: req.query,
-// 	};
-// }
-
-async function performSearch(req) {
-	const page = Math.max(1, parseInt(req.query.page, 10)) || 1;
-	const data = await prepareSearchData(req, page);
-	let searchData;
-	try {
-		[searchData] = await Promise.all([
-			search.search(data),
-			recordSearch(data),
-		]);
-	} catch (error) {
-		// If search fails, return an empty result set
-		searchData = { posts: [], matchCount: 0, pageCount: 1, time: 0 };
-	}
-
-	searchData.pagination = pagination.create(page, searchData.pageCount, req.query);
-	searchData.multiplePages = searchData.pageCount > 1;
-	searchData.search_query = validator.escape(String(req.query.term || ''));
-	searchData.term = req.query.term;
-
-	return searchData;
+	return {
+		query: req.query.term,
+		searchIn: req.query.in || meta.config.searchDefaultIn || 'titlesposts',
+		matchWords: req.query.matchWords || 'all',
+		postedBy: req.query.by,
+		categories: Array.isArray(req.query.categories) ? req.query.categories : [req.query.categories],
+		searchChildren: req.query.searchChildren,
+		hasTags: Array.isArray(req.query.hasTags) ? req.query.hasTags : [req.query.hasTags],
+		replies: validator.escape(String(req.query.replies || '')),
+		repliesFilter: validator.escape(String(req.query.repliesFilter || '')),
+		timeRange: validator.escape(String(req.query.timeRange || '')),
+		timeFilter: validator.escape(String(req.query.timeFilter || '')),
+		sortBy: validator.escape(String(req.query.sortBy || '')) || meta.config.searchDefaultSortBy || '',
+		sortDirection: validator.escape(String(req.query.sortDirection || '')),
+		page: page,
+		itemsPerPage: req.query.itemsPerPage,
+		uid: req.uid,
+		qs: req.query,
+	};
 }
 
 async function getUserPrivileges(uid) {
